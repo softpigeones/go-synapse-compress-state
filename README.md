@@ -3,12 +3,9 @@
 This workspace contains experimental tools that attempt to reduce the number of
 rows in the `state_groups_state` table inside of a Synapse Postgresql database.
 
-The project includes both Rust and Go implementations of the compression tools:
+The project is implemented in Go and provides both manual and automatic compression tools.
 
-- **Rust implementation**: The original implementation with `synapse_auto_compressor` and `synapse_compress_state`
-- **Go implementation**: A port of the compression logic to Go, located in `cmd/synapse_compress_state/` and `pkg/`
-
-# Automated tool: synapse_auto_compressor (Rust)
+# Automated tool: synapse_auto_compressor
 
 ## Introduction:
 
@@ -28,17 +25,13 @@ periodically.
 
 ## Building
 
-This tool requires `cargo` to be installed. See https://www.rust-lang.org/tools/install
+This tool requires Go 1.21 or later to be installed. See https://go.dev/doc/install
 for instructions on how to do this.
 
-This project follows the deprecation policy of [Synapse](https://matrix-org.github.io/synapse/latest/deprecation_policy.html)
-on Rust and will assume a recent stable version of Rust and the ability to fetch a more recent one if necessary.
-
 To build `synapse_auto_compressor`, clone this repository and navigate to the
-`synapse_auto_compressor/` subdirectory. Then execute `cargo build`.
+root directory. Then execute `go build -o synapse_auto_compressor ./cmd/synapse_auto_compressor`.
 
-This will create an executable and store it in
-`synapse_auto_compressor/target/debug/synapse_auto_compressor`.
+This will create an executable named `synapse_auto_compressor`.
 
 ## Example usage
 
@@ -58,7 +51,7 @@ $ sudo -u postgres synapse_auto_compressor -p "user=postgres dbname=matrix-synap
 The configuration for connecting to the Postgres database. This should be of the form
 `"postgresql://username:password@mydomain.com/database"` or a key-value pair
 string: `"user=username password=password dbname=database host=mydomain.com"`
-See https://docs.rs/tokio-postgres/0.7.2/tokio_postgres/config/struct.Config.html
+See https://pkg.go.dev/github.com/jackc/pgx/v5/pgconn#Config
 for the full details.
 
 - -c [CHUNK_SIZE] **Required**

@@ -26,7 +26,7 @@ import (
 type StateGroupEntry struct {
 	InRange        bool
 	PrevStateGroup *int64
-	StateMap       *state_map.StateMap[string]
+	StateMap       *state_map.StateMap
 }
 
 // Stats keeps track of some statistics of a compression run.
@@ -137,7 +137,7 @@ func (c *Compressor) CreateNewTree() {
 			}
 		}
 
-		var delta *state_map.StateMap[string]
+		var delta *state_map.StateMap
 		var actualPrevStateGroup *int64
 
 		if entriesHaveSamePrev(entry, prevStateGroup) {
@@ -179,7 +179,7 @@ func entriesHaveSamePrev(entry *StateGroupEntry, prevStateGroup *int64) bool {
 	return true
 }
 
-func stateMapsEqual(a, b *state_map.StateMap[string]) bool {
+func stateMapsEqual(a, b *state_map.StateMap) bool {
 	if a.Len() != b.Len() {
 		return false
 	}
@@ -203,7 +203,7 @@ func stateMapsEqual(a, b *state_map.StateMap[string]) bool {
 // group that can be used as a base for a delta.
 //
 // Returns the state map and the actual base state group (if any) used.
-func (c *Compressor) getDelta(prevSG *int64, sg int64) (*state_map.StateMap[string], *int64) {
+func (c *Compressor) getDelta(prevSG *int64, sg int64) (*state_map.StateMap, *int64) {
 	stateMap := CollapseStateMaps(c.OriginalStateMap, sg)
 
 	if prevSG == nil {
@@ -213,7 +213,7 @@ func (c *Compressor) getDelta(prevSG *int64, sg int64) (*state_map.StateMap[stri
 	// This is a loop to go through to find the first prev_sg which can be
 	// a valid base for the state group.
 	currentPrevSG := *prevSG
-	var prevStateMap *state_map.StateMap[string]
+	var prevStateMap *state_map.StateMap
 
 outer:
 	for {
@@ -244,7 +244,7 @@ outer:
 	}
 
 	// We've found a valid base, now we just need to calculate the delta.
-	deltaMap := state_map.New[string]()
+	deltaMap := state_map.NewStateMap()
 
 	iter := stateMap.Iterator()
 	for iter.Next() {
@@ -260,13 +260,13 @@ outer:
 }
 
 // CollapseStateMaps gets the full state for a given group from the map (of deltas).
-func CollapseStateMaps(m map[int64]*StateGroupEntry, stateGroup int64) *state_map.StateMap[string] {
+func CollapseStateMaps(m map[int64]*StateGroupEntry, stateGroup int64) *state_map.StateMap {
 	entry, ok := m[stateGroup]
 	if !ok {
 		panic(fmt.Sprintf("Missing %d", stateGroup))
 	}
 
-	stateMap := state_map.New[string]()
+	stateMap := state_map.NewStateMap()
 	stack := []int64{stateGroup}
 
 	for entry.PrevStateGroup != nil {

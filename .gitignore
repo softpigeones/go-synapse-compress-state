@@ -1,19 +1,39 @@
 ```
-# Go build artifacts
+# Build artifacts
 *.o
-*.a
-*.so
-*.dylib
-*.dll
-*.exe
-
-# Go cache and tools
-go/pkg/
-go/build/
-vendor/
+*.obj
+*.out
 
 # Dependencies
-node_modules/
+vendor/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+*.env.*
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Rust artifacts (from deleted Cargo files)
+target/
+Cargo.lock
+
+# Python artifacts (from deleted pyproject.toml)
 __pycache__/
 *.pyc
 *.pyo
@@ -22,60 +42,33 @@ __pycache__/
 env/
 venv/
 .venv/
-.env
-.env.local
-.env.*
-
-# Build directories
-build/
-dist/
-target/
-out/
-bin/
-
-# Logs
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage*
+nosetests.xml
+coverage.xml
+*.cover
 *.log
-_logs/
-
-# Temporary files
-*.tmp
-*.temp
-*~
+*.pot
+*.pyc
+*.pyo
+*.pyd
+.MF
+tags
+TAGS
+id
+*.gch
+*.orig
+*.rej
+*.bak
+*.elc
+*.un~
 .DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
 Thumbs.db
-
-# IDE specific
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Coverage
-.coverage
-htmlcov/
-coverage/
-
-# Compressed files
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
 ```

@@ -14,49 +14,48 @@
 
 package state_map
 
-// Key represents a composite key for the state map (type, state_key)
-type Key struct {
-	Type     string
-	StateKey string
+// StateMap is a type alias for StateMap[string] for backward compatibility
+type StateMap = StateMapString
+
+// StateMapString is a state map with string values
+type StateMapString struct {
+	data map[Key]string
 }
 
-// StateMap is a map from (type, state_key) to value V
-type StateMap[V any] struct {
-	data map[Key]V
-}
-
-// New creates a new empty StateMap
-func New[V any]() *StateMap[V] {
-	return &StateMap[V]{
-		data: make(map[Key]V),
+// NewStateMap creates a new empty StateMap with string values
+func NewStateMap() *StateMapString {
+	return &StateMapString{
+		data: make(map[Key]string),
 	}
 }
 
 // Set sets a value in the state map
-func (sm *StateMap[V]) Set(eventType, stateKey string, value V) {
+func (sm *StateMapString) Set(eventType, stateKey, value string) {
 	sm.data[Key{Type: eventType, StateKey: stateKey}] = value
 }
 
 // Get retrieves a value from the state map
-func (sm *StateMap[V]) Get(eventType, stateKey string) (V, bool) {
+func (sm *StateMapString) Get(eventType, stateKey string) (string, bool) {
 	value, ok := sm.data[Key{Type: eventType, StateKey: stateKey}]
 	return value, ok
 }
 
 // Contains checks if a key exists in the state map
-func (sm *StateMap[V]) Contains(eventType, stateKey string) bool {
+func (sm *StateMapString) Contains(eventType, stateKey string) bool {
 	_, ok := sm.data[Key{Type: eventType, StateKey: stateKey}]
 	return ok
 }
 
 // Len returns the number of entries in the state map
-func (sm *StateMap[V]) Len() int {
+func (sm *StateMapString) Len() int {
 	return len(sm.data)
 }
 
 // Copy creates a shallow copy of the state map
-func (sm *StateMap[V]) Copy() *StateMap[V] {
-	newMap := New[V]()
+func (sm *StateMapString) Copy() *StateMapString {
+	newMap := &StateMapString{
+		data: make(map[Key]string),
+	}
 	for k, v := range sm.data {
 		newMap.data[k] = v
 	}
@@ -64,12 +63,12 @@ func (sm *StateMap[V]) Copy() *StateMap[V] {
 }
 
 // Iterator returns an iterator over the state map
-func (sm *StateMap[V]) Iterator() *StateMapIterator[V] {
+func (sm *StateMapString) Iterator() *StateMapStringIterator {
 	keys := make([]Key, 0, len(sm.data))
 	for k := range sm.data {
 		keys = append(keys, k)
 	}
-	return &StateMapIterator[V]{
+	return &StateMapStringIterator{
 		keys: keys,
 		data: sm.data,
 		idx:  -1,
@@ -77,7 +76,7 @@ func (sm *StateMap[V]) Iterator() *StateMapIterator[V] {
 }
 
 // Range iterates over all entries in the state map
-func (sm *StateMap[V]) Range(f func(Key, V) bool) {
+func (sm *StateMapString) Range(f func(Key, string) bool) {
 	for k, v := range sm.data {
 		if !f(k, v) {
 			return
@@ -85,21 +84,21 @@ func (sm *StateMap[V]) Range(f func(Key, V) bool) {
 	}
 }
 
-// StateMapIterator is an iterator for StateMap
-type StateMapIterator[V any] struct {
+// StateMapStringIterator is an iterator for StateMapString
+type StateMapStringIterator struct {
 	keys []Key
-	data map[Key]V
+	data map[Key]string
 	idx  int
 }
 
 // Next advances the iterator and returns true if there are more elements
-func (it *StateMapIterator[V]) Next() bool {
+func (it *StateMapStringIterator) Next() bool {
 	it.idx++
 	return it.idx < len(it.keys)
 }
 
 // Key returns the current key
-func (it *StateMapIterator[V]) Key() Key {
+func (it *StateMapStringIterator) Key() Key {
 	if it.idx < 0 || it.idx >= len(it.keys) {
 		panic("iterator out of bounds")
 	}
@@ -107,10 +106,15 @@ func (it *StateMapIterator[V]) Key() Key {
 }
 
 // Value returns the current value
-func (it *StateMapIterator[V]) Value() V {
+func (it *StateMapStringIterator) Value() string {
 	if it.idx < 0 || it.idx >= len(it.keys) {
-		var zero V
-		return zero
+		return ""
 	}
 	return it.data[it.keys[it.idx]]
+}
+
+// Key represents a composite key for the state map (type, state_key)
+type Key struct {
+	Type     string
+	StateKey string
 }
