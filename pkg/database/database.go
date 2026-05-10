@@ -29,7 +29,7 @@ import (
 type StateGroupEntry struct {
 	InRange        bool
 	PrevStateGroup *int64
-	StateMap       *state_map.StateMap[string]
+	StateMap       *state_map.StateMap
 }
 
 // GetInitialDataFromDB fetches the entries in state_groups_state and immediate predecessors for
@@ -76,7 +76,7 @@ func GetInitialDataFromDB(ctx context.Context, conn *pgx.Conn, roomID string, mi
 		entry, ok := stateGroupMap[id]
 		if !ok {
 			entry = &StateGroupEntry{
-				StateMap: state_map.New[string](),
+				StateMap: state_map.NewStateMap(),
 			}
 			stateGroupMap[id] = entry
 		}
@@ -143,7 +143,7 @@ func LoadLevelHeads(ctx context.Context, conn *pgx.Conn, levelInfo []*compressor
 				// Default StateGroupEntry has InRange as false
 				// This is what we want since as a level head, it has already been compressed by the
 				// previous run!
-				StateMap: state_map.New[string](),
+				StateMap: state_map.NewStateMap(),
 			}
 			stateGroupMap[id] = entry
 		}
@@ -361,7 +361,7 @@ func GetMissingFromDB(ctx context.Context, conn *pgx.Conn, missingSGs []int64, m
 		entry, ok := stateGroupMap[id]
 		if !ok {
 			entry = &StateGroupEntry{
-				StateMap: state_map.New[string](),
+				StateMap: state_map.NewStateMap(),
 			}
 			stateGroupMap[id] = entry
 		}

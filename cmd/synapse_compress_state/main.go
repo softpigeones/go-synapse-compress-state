@@ -296,7 +296,7 @@ func checkThatMapsMatch(oldMap, newMap map[int64]*compressor.StateGroupEntry) {
 	log.Println("New state map matches old one")
 }
 
-func stateMapsEqual(a, b *state_map.StateMap[string]) bool {
+func stateMapsEqual(a, b *state_map.StateMap) bool {
 	if a.Len() != b.Len() {
 		return false
 	}
@@ -313,13 +313,13 @@ func stateMapsEqual(a, b *state_map.StateMap[string]) bool {
 }
 
 // collapseStateMaps gets the full state for a given group from the map (of deltas).
-func collapseStateMaps(m map[int64]*compressor.StateGroupEntry, stateGroup int64) *state_map.StateMap[string] {
+func collapseStateMaps(m map[int64]*compressor.StateGroupEntry, stateGroup int64) *state_map.StateMap {
 	entry, ok := m[stateGroup]
 	if !ok {
 		panic(fmt.Sprintf("Missing %d", stateGroup))
 	}
 
-	stateMap := state_map.New[string]()
+	stateMap := state_map.NewStateMap()
 	stack := []int64{stateGroup}
 
 	for entry.PrevStateGroup != nil {
