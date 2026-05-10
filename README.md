@@ -3,7 +3,12 @@
 This workspace contains experimental tools that attempt to reduce the number of
 rows in the `state_groups_state` table inside of a Synapse Postgresql database.
 
-# Automated tool: synapse_auto_compressor
+The project includes both Rust and Go implementations of the compression tools:
+
+- **Rust implementation**: The original implementation with `synapse_auto_compressor` and `synapse_compress_state`
+- **Go implementation**: A port of the compression logic to Go, located in `cmd/synapse_compress_state/` and `pkg/`
+
+# Automated tool: synapse_auto_compressor (Rust)
 
 ## Introduction:
 
@@ -82,7 +87,7 @@ it to run at a quiet time for the server. This could be done by creating an exec
 script and scheduling it with something like
 [cron](https://www.man7.org/linux/man-pages/man1/crontab.1.html).
 
-# Manual tool: synapse_compress_state
+# Manual tool: synapse_compress_state (Rust)
 
 ## Introduction
 
@@ -107,7 +112,7 @@ from any of the queries that Synapse performs.
 The tool will also ensure that the generated state deltas do give the same state
 as the existing state deltas before generating any SQL.
 
-## Building
+## Building (Rust)
 
 This tool requires `cargo` to be installed. See https://www.rust-lang.org/tools/install
 for instructions on how to do this.
@@ -116,12 +121,33 @@ To build `synapse_compress_state`, clone this repository and then execute `cargo
 
 This will create an executable and store it in `target/debug/synapse_compress_state`.
 
-## Example usage
+## Manual tool: synapse_compress_state (Go)
 
+## Introduction
+
+A Go implementation of the manual compression tool that provides the same functionality
+as the Rust version. It reads from `state_groups_state` and `state_group_edges` tables
+for a specified room and calculates changes to reduce the number of rows.
+
+## Building (Go)
+
+This tool requires Go 1.21 or later to be installed. See https://go.dev/dl/ for
+installation instructions.
+
+To build the Go version of `synapse_compress_state`, clone this repository and navigate
+to the repository root, then execute:
+
+```bash
+go build ./cmd/synapse_compress_state
 ```
-$ synapse_compress_state -p "postgresql://localhost/synapse" -r '!some_room:example.com' -o out.sql -t
+
+This will create an executable named `synapse_compress_state` in the current directory.
+
+## Example usage (Go)
+
+```bash
+$ ./synapse_compress_state -p "postgresql://localhost/synapse" -r '!some_room:example.com' -o out.sql -t
 Fetching state from DB for room '!some_room:example.com'...
-Got initial state from database. Checking for any missing state groups...
 Number of state groups: 73904
 Number of rows in current table: 2240043
 Number of rows after compression: 165754 (7.40%)
@@ -135,14 +161,12 @@ New state map matches old one
 $ psql synapse < out.data
 ```
 
-## Running Options
+## Running Options (Go)
 
 - -p [POSTGRES_LOCATION] **Required**
 The configuration for connecting to the Postgres database. This should be of the form
 `"postgresql://username:password@mydomain.com/database"` or a key-value pair
 string: `"user=username password=password dbname=database host=mydomain.com"`
-See https://docs.rs/tokio-postgres/0.7.2/tokio_postgres/config/struct.Config.html
-for the full details.
 
 - -r [ROOM_ID] **Required**
 The room to process (this is the value found in the `rooms` table of the database
@@ -189,6 +213,8 @@ If this flag is set then output the node and edge information for the state_grou
 directed graph built up from the predecessor state_group links. These can be looked
 at in something like Gephi (https://gephi.org).
 
+- -N
+Do not double-check that the compression was performed correctly (skip verification).
 
 # Running tests
 
