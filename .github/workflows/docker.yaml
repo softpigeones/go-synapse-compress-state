@@ -42,7 +42,6 @@ jobs:
         with:
           images: |
             ghcr.io/${{ github.repository }}
-            docker.io/${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.event.repository.name }}
           flavor: |
             latest=false
           tags: |
@@ -50,13 +49,6 @@ jobs:
             type=sha,prefix=,format=long
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}.{{minor}}
-
-      - name: Log in to DockerHub
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Log in to GHCR
         if: github.event_name != 'pull_request'
