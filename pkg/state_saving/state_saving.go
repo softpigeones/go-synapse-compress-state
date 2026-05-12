@@ -222,7 +222,9 @@ func WriteRoomCompressorState(ctx context.Context, conn *pgx.Conn, roomID string
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback(ctx)
+	defer func() {
+		_ = tx.Rollback(ctx)
+	}()
 
 	// Go through every level that the compressor is using
 	for levelNum, level := range levelInfo {

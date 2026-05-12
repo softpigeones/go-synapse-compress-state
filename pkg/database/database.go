@@ -397,7 +397,9 @@ func SendChangesToDB(ctx context.Context, dbURL string, roomID string, oldMap, n
 	if err != nil {
 		panic(fmt.Sprintf("Error starting transaction: %v", err))
 	}
-	defer tx.Rollback(ctx)
+	defer func() {
+		_ = tx.Rollback(ctx)
+	}()
 
 	for sg, oldEntry := range oldMap {
 		newEntry, ok := newMap[sg]

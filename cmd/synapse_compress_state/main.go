@@ -18,7 +18,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"strconv"
@@ -130,14 +129,6 @@ func parseArgs() *Config {
 	}
 
 	return config
-}
-
-func int64Ptr(i int64) *int64 {
-	return &i
-}
-
-func int32Ptr(i int32) *int32 {
-	return &i
 }
 
 func main() {
@@ -459,11 +450,6 @@ func outputSQL(config *Config, oldMap, newMap map[int64]*compressor.StateGroupEn
 // Unused helper functions kept for potential future use
 var _ = func() {} // Placeholder to avoid unused import errors
 
-// Helper to set flag.Int64Var with a pointer
-func flagInt64VarPtr(p **int64, name string, value int64, usage string) {
-	*p = flag.Int64(name, value, usage)
-}
-
 // Helper to open output file
 func openOutputFile(path string) *os.File {
 	if path == "" {
@@ -474,12 +460,4 @@ func openOutputFile(path string) *os.File {
 		log.Fatalf("Unable to create output file: %v", err)
 	}
 	return file
-}
-
-// Helper to write to file
-func writeFile(w io.Writer, data string) {
-	_, err := w.Write([]byte(data))
-	if err != nil {
-		log.Fatalf("Error writing: %v", err)
-	}
 }
